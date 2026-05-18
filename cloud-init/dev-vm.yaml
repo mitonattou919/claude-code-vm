@@ -1,0 +1,103 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - git
+  - curl
+  - wget
+  - ca-certificates
+  - openssh-client
+  - gnupg
+  - gnupg2
+  - ripgrep
+  - fd-find
+  - jq
+  - less
+  - tree
+  - nano
+  - vim
+  - zip
+  - unzip
+  - procps
+
+write_files:
+  - path: /etc/profile.d/prompt.sh
+    permissions: '0644'
+    owner: 'root:root'
+    content: |
+      parse_git_branch() {
+        git branch --show-current 2>/dev/null
+      }
+
+      parse_git_repo() {
+        basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null
+      }
+
+      _git_info() {
+        local repo branch
+        repo=$(parse_git_repo)
+        branch=$(parse_git_branch)
+        [ -n "$repo" ] && printf " \001\e[36m\002%s\001\e[0m\002 \001\e[33m\002[%s]\001\e[0m\002" "$repo" "$branch"
+      }
+
+      export PS1='\[\e[92m\]bash \[\e[0m\]\[\e[92m\]\W\[\e[0m\]$(_git_info)\$ '
+
+  - path: /etc/profile.d/proxy.sh
+    permissions: '0644'
+    owner: 'root:root'
+    content: |
+      export HTTP_PROXY="http://__PROXY_IP__:3128"
+      export HTTPS_PROXY="http://__PROXY_IP__:3128"
+      export no_proxy="localhost,127.0.0.1,169.254.169.254"
+      export NO_PROXY="localhost,127.0.0.1,169.254.169.254"
+
+  - path: /etc/apt/apt.conf.d/95proxy
+    permissions: '0644'
+    owner: 'root:root'
+    content: |
+      Acquire::http::Proxy "http://__PROXY_IP__:3128";
+      Acquire::https::Proxy "http://__PROXY_IP__:3128";
+
+  - path: /etc/claude-code/managed-settings.json
+    permissions: '0644'
+    owner: 'root:root'
+    encoding: b64
+    content: __MANAGED_SETTINGS__
+
+  - path: /etc/claude-code/statusline.sh
+    permissions: '0755'
+    owner: 'root:root'
+    encoding: b64
+    content: __STATUSLINE_SH__
+
+runcmd:
+  - |
+    set -e
+    export HTTP_PROXY="http://__PROXY_IP__:3128"
+    export HTTPS_PROXY="http://__PROXY_IP__:3128"
+    export NO_PROXY="localhost,127.0.0.1,169.254.169.254"
+
+    # Wait for Squid proxy to become available
+    until curl -sf -x "http://__PROXY_IP__:3128" "http://azure.archive.ubuntu.com/ubuntu/" > /dev/null 2>&1; do
+      echo "Waiting for proxy at __PROXY_IP__:3128..."
+      sleep 15
+    done
+    echo "Proxy is ready"
+
+    # gh CLI
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      > /etc/apt/sources.list.d/github-cli.list
+    apt-get update -qq
+    apt-get install -y gh
+
+    # Node.js LTS
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+    apt-get install -y nodejs
+
+    # Claude Code
+    npm install -g @anthropic-ai/claude-code
+
+    # fd: パッケージ名はfd-findだがコマンドはfdfindなのでシンボリックリンクを張る
+    ln -sf /usr/bin/fdfind /usr/local/bin/fd

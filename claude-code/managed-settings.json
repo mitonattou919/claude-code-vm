@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "deny": [
+      "Bash(rm -rf*)",
+      "Bash(sudo *)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(wget * | bash)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(dd if=*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./**/secrets/**)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)"
+    ],
+    "additionalDirectories": [],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "env": {
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "companyAnnouncements": [
+    "Welcome to {Your Company}! Review our code guideline at {url}"
+  ],
+  "includeCoAuthoredBy": true,
+  "cleanupPeriodDays": 30,
+  "statusLine": {
+    "type": "command",
+    "command": "/etc/claude-code/statusline.sh",
+    "refreshInterval": 5
+  }
+}

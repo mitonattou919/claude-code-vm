@@ -1,0 +1,27 @@
+# Claude AI
+.claude.ai
+.claude.com
+.anthropic.com
+# GitHub
+.github.com
+.githubusercontent.com
+# npm
+.npmjs.org
+.npmjs.com
+# Ubuntu / Debian パッケージ
+.ubuntu.com
+.debian.org
+.launchpad.net
+archive.ubuntu.com
+security.ubuntu.com
+# Microsoft (Entra ID SSH拡張, Azure extensions)
+.microsoft.com
+.azure.com
+.windows.net
+login.microsoftonline.com
+# Node.js
+.nodejs.org
+.nodesource.com
+deb.nodesource.com
+# GitHub CLI
+cli.github.com

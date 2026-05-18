@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workload": {
+      "value": "ccv"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "location": {
+      "value": "japaneast"
+    },
+    "allowedSshSourceIp": {
+      "value": "*"
+    },
+    "keyVaultName": {
+      "value": "kv-ccv-dev-001"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "ownerTag": {
+      "value": "your-email@example.com"
+    },
+    "proxyPrivateIp": {
+      "value": "192.168.95.68"
+    }
+  }
+}
